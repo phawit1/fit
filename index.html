@@ -1,0 +1,468 @@
+<!doctype html>
+<html lang="th">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AI Sport Coach | Smart Training</title>
+
+    <!-- โหลดฟอนต์ Prompt -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@100;200;300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+
+  <body>
+    <header class="topbar">
+      <div class="brand">
+        <div class="logo">✳</div>
+        <div>AI SPORT COACH<small>SMART MOVEMENT LAB</small></div>
+      </div>
+      <nav class="nav" aria-label="เมนูหลัก">
+        <button class="active" data-page="trainPage">ฝึกซ้อม</button
+        ><button data-page="howPage">วิธีใช้งาน</button
+        ><button data-page="guidePage">วิธีทำท่าที่ถูกต้อง</button>
+      </nav>
+    </header>
+    <main>
+      <section id="trainPage" class="page active">
+        <div class="heading">
+          <div>
+            <div class="eyebrow">● SPORTS INNOVATION PROJECT</div>
+            <h1>Train smarter.<br /><em>Move better.</em></h1>
+            <p>
+              โค้ชออกกำลังกายอัจฉริยะ
+              วิเคราะห์การเคลื่อนไหวผ่านกล้องแบบเรียลไทม์
+            </p>
+          </div>
+          <div class="pill">
+            <span class="dot"></span> ประมวลผลภาพในเบราว์เซอร์*
+          </div>
+        </div>
+        <div class="layout">
+          <div class="camera-column">
+            <section class="panel">
+              <div class="panel-head">
+                <div>
+                  <div class="panel-title">LIVE MOTION CAPTURE</div>
+                  <div class="sub">กล้องและโครงกระดูก AI</div>
+                </div>
+                <div class="pill" id="cameraStatus">● CAMERA OFF</div>
+              </div>
+              <div class="camera-stage" id="stage">
+                <video id="video" playsinline muted></video
+                ><canvas id="canvas"></canvas>
+                <div class="camera-placeholder" id="placeholder">
+                  <div class="camera-icon">⌁</div>
+                  <h3>พร้อมเริ่มฝึกซ้อมหรือยัง?</h3>
+                  <p>
+                    เลือกท่าหรือโปรแกรม อ่านคำแนะนำ
+                    แล้วเปิดกล้องเพื่อเตรียมความพร้อมก่อนเริ่มฝึก
+                  </p>
+                </div>
+                <div class="live-badge" id="liveBadge">● LIVE TRACKING</div>
+                <div
+                  id="cameraSignal"
+                  class="camera-status checking"
+                  role="status"
+                  aria-live="polite"
+                >
+                  <span class="status-icon">…</span
+                  ><span id="cameraSignalText">รอตรวจกล้อง</span>
+                </div>
+                <div id="countdownOverlay" class="countdown-overlay">
+                  <div class="countdown-number" id="countdownNumber">3</div>
+                </div>
+              </div>
+              <div class="camera-foot">
+                <div class="hint" id="cameraHint">
+                  วางกล้องให้นิ่ง จัดแสงให้เพียงพอ และทำตามคำแนะนำของท่าที่เลือก
+                </div>
+                <div style="display: flex; gap: 8px; flex-wrap: wrap">
+                  <button class="secondary" id="stopBtn" disabled>
+                    หยุด/ปิดกล้อง</button
+                  ><button class="primary" id="startBtn">▶ เริ่มฝึก</button>
+                </div>
+              </div>
+            </section>
+            <section class="panel notice-under-camera">
+              <strong>ข้อควรทราบ</strong>
+              <p>
+                ระบบนี้เป็นต้นแบบเพื่อการศึกษา คะแนนเป็นการประเมินจากจุดข้อต่อ
+                และเกณฑ์การเคลื่อนไหวเบื้องต้น ไม่ใช่การรับรองว่าท่าถูกต้อง
+                หรือปลอดภัย 100% ควรหยุดเมื่อรู้สึกเจ็บหรือไม่สบาย
+              </p>
+              <p>
+                *ภาพจากกล้องประมวลผลในเบราว์เซอร์ในโค้ดนี้ โมเดล AI โหลดจาก CDN
+                จึงต้องใช้อินเทอร์เน็ตในครั้งแรก
+              </p>
+            </section>
+          </div>
+          <aside class="side">
+            <section class="panel">
+              <div class="panel-head">
+                <div>
+                  <div class="panel-title">เลือกโปรแกรมฝึก</div>
+                  <div class="sub">SELECT YOUR WORKOUT</div>
+                </div>
+              </div>
+              <div class="section-pad">
+                <div class="mode-switch">
+                  <button id="singleMode" class="active">ฝึกท่าเดียว</button
+                  ><button id="circuitMode">โปรแกรมเป็นรอบ</button>
+                </div>
+                <div id="singleSettings">
+                  <label class="select-label" for="exercise"
+                    >ท่าออกกำลังกาย</label
+                  >
+                  <div class="select-wrap"><select id="exercise"></select></div>
+                  <div class="exercise-desc">
+                    <div class="exercise-symbol" id="exerciseIcon">↕</div>
+                    <div>
+                      <strong id="exerciseName">SQUAT / สควอต</strong>
+                      <p id="exerciseDesc">เลือกท่าเพื่อดูคำอธิบาย</p>
+                    </div>
+                  </div>
+                </div>
+                <div id="circuitSettings" hidden>
+                  <label class="select-label" for="preset"
+                    >โปรแกรมตั้งต้น</label
+                  >
+                  <div class="select-wrap">
+                    <select id="preset">
+                      <option value="beginner">
+                        Beginner Starter — มือใหม่
+                      </option>
+                      <option value="lowimpact">
+                        Low Impact — แรงกระแทกต่ำ
+                      </option>
+                      <option value="fullbody">Full Body — ทั้งร่างกาย</option>
+                    </select>
+                  </div>
+                  <div class="round-row">
+                    <label for="rounds">จำนวนรอบ</label>
+                    <div>
+                      <input
+                        type="range"
+                        id="rounds"
+                        min="1"
+                        max="5"
+                        value="2"
+                      />
+                      <div class="small-muted">
+                        <span id="roundsValue">2</span> รอบ
+                      </div>
+                    </div>
+                  </div>
+                  <div class="small-muted" style="margin-top: 12px">
+                    แต่ละท่า 20 วินาที · พักระหว่างท่า 10 วินาที · นับถอยหลัง 3
+                    วินาที · พักระหว่างรอบ 15 วินาที
+                  </div>
+                  <h3 style="font-size: 14px; margin: 16px 0 6px">
+                    ปรับรายการท่าและลำดับ
+                  </h3>
+                  <div id="planBuilder" class="plan-builder"></div>
+                </div>
+              </div>
+            </section>
+            <section class="panel">
+              <div class="panel-head">
+                <div>
+                  <div class="panel-title">สถานะการฝึก</div>
+                  <div class="sub" id="workoutState">รอเริ่มฝึก</div>
+                </div>
+              </div>
+              <div class="stats">
+                <div class="stat">
+                  <div class="stat-label">REPETITIONS <span>↻</span></div>
+                  <div class="stat-value green" id="reps">0</div>
+                  <div class="stat-unit">ครั้งที่ผ่านเกณฑ์การนับ</div>
+                </div>
+                <div class="stat">
+                  <div class="stat-label">FORM SCORE <span>◈</span></div>
+                  <div class="stat-value" id="score">
+                    --<small style="font-size: 14px">%</small>
+                  </div>
+                  <div class="stat-unit">คุณภาพท่าโดยประมาณ</div>
+                </div>
+                <div class="stat">
+                  <div class="stat-label">SESSION TIME <span>◷</span></div>
+                  <div class="stat-value" id="time">00:00</div>
+                  <div class="stat-unit">เวลาฝึกทั้งหมด</div>
+                </div>
+                <div class="stat">
+                  <div class="stat-label">POSE VISIBILITY <span>⌖</span></div>
+                  <div class="stat-value" id="confidence">
+                    --<small style="font-size: 14px">%</small>
+                  </div>
+                  <div class="stat-unit">การมองเห็นจุดร่างกาย</div>
+                </div>
+              </div>
+              <div class="score-wrap">
+                <div class="score-line">
+                  <span>คุณภาพการเคลื่อนไหว</span
+                  ><strong id="scoreLabel">รอเริ่มฝึก</strong>
+                </div>
+                <div class="progress">
+                  <div id="scoreBar"></div>
+                </div>
+              </div>
+              <div class="feedback">
+                <div class="feedback-top">
+                  <span class="feedback-indicator" id="feedbackDot"></span
+                  ><span id="feedbackTitle">รอข้อมูลจากกล้อง</span>
+                </div>
+                <p id="feedbackText">
+                  คะแนนจะแสดงเมื่อระบบมีข้อมูลท่าทางเพียงพอ
+                </p>
+              </div>
+              <div class="phase-banner" id="phaseBanner"></div>
+              <div class="controls">
+                <button class="secondary" id="pauseBtn" disabled>
+                  ⏸ พักชั่วคราว</button
+                ><button class="secondary" id="skipBtn" disabled>ข้ามท่า</button
+                ><button class="danger" id="finishBtn" disabled>
+                  จบการฝึก
+                </button>
+              </div>
+            </section>
+            <section class="panel">
+              <div class="tips">
+                <h3>✦ เทคนิคการฝึกที่ดี</h3>
+                <div class="tip">
+                  <span>01</span>
+                  <div>
+                    ให้ร่างกายส่วนที่จำเป็นอยู่ในภาพ
+                    และเลือกมุมกล้องตามคำแนะนำของท่า
+                  </div>
+                </div>
+                <div class="tip">
+                  <span>02</span>
+                  <div>
+                    เคลื่อนไหวช้า ๆ และควบคุมท่าทาง
+                    เน้นทำให้ถูกมากกว่าทำให้ได้จำนวนมาก
+                  </div>
+                </div>
+                <div class="tip">
+                  <span>03</span>
+                  <div>
+                    หากตรวจจับไม่ชัด ให้หยุดและปรับกล้อง
+                    ระบบจะไม่เดาคะแนนเมื่อข้อมูลไม่พอ
+                  </div>
+                </div>
+              </div>
+            </section>
+            <section class="panel">
+              <div class="panel-head">
+                <div>
+                  <div class="panel-title">ประวัติการฝึก</div>
+                  <div class="sub">บันทึกไว้ในเบราว์เซอร์นี้</div>
+                </div>
+                <button
+                  class="secondary"
+                  id="resetBtn"
+                  style="padding: 8px 10px; font-size: 12px"
+                >
+                  ล้างประวัติ
+                </button>
+              </div>
+              <div class="section-pad" id="history">
+                <div class="sub">ยังไม่มีประวัติการฝึก</div>
+              </div>
+            </section>
+          </aside>
+        </div>
+      </section>
+      <section id="howPage" class="page">
+        <div class="heading">
+          <div>
+            <div class="eyebrow">USER GUIDE</div>
+            <h1>วิธีใช้งาน <em>AI Sport Coach</em></h1>
+            <p>คำอธิบายสัญลักษณ์ การจัดกล้อง และการเริ่มฝึก</p>
+          </div>
+        </div>
+        <div class="content-grid">
+          <article class="info-card">
+            <h2>สัญลักษณ์สถานะกล้อง</h2>
+            <div class="legend-row">
+              <div class="legend-icon legend-green">✓</div>
+              <div>
+                <strong>สีเขียว — พร้อมฝึก</strong>
+                <p>
+                  กล้องทำงานและตรวจพบจุดร่างกายที่จำเป็นต่อท่าที่เลือกได้เพียงพอ
+                  ไม่ได้หมายความว่าระบบยืนยันว่าท่าถูกต้องแล้ว
+                </p>
+              </div>
+            </div>
+            <div class="legend-row">
+              <div class="legend-icon legend-yellow">…</div>
+              <div>
+                <strong>สีเหลือง — กำลังตรวจสอบ</strong>
+                <p>
+                  ระบบกำลังเปิดกล้อง โหลดโมเดล
+                  หรือรอให้ร่างกายอยู่ในภาพชัดเจนขึ้น
+                </p>
+              </div>
+            </div>
+            <div class="legend-row">
+              <div class="legend-icon legend-red">!</div>
+              <div>
+                <strong>สีแดง — ต้องตรวจสอบ</strong>
+                <p>
+                  กล้องเปิดไม่ได้หรือมองไม่เห็นจุดสำคัญ ลองเพิ่มแสง ปรับระยะ
+                  และตรวจว่าร่างกายไม่หลุดเฟรม
+                </p>
+              </div>
+            </div>
+            <p>
+              ระบบใช้ทั้งสี ไอคอน และข้อความ
+              เพื่อไม่ให้ต้องแยกความหมายจากสีอย่างเดียว
+            </p>
+          </article>
+          <article class="info-card">
+            <h2>เริ่มฝึกอย่างไร</h2>
+            <ol>
+              <li>เลือกฝึกท่าเดียว หรือเลือกโปรแกรมเป็นรอบ</li>
+              <li>
+                เลือกท่า/โปรแกรม อ่านคำแนะนำมุมกล้องและพื้นที่ที่ต้องเตรียม
+              </li>
+              <li>กด “รับทราบและตรวจกล้อง” ในหน้าต่างคำแนะนำ</li>
+              <li>อนุญาตให้เบราว์เซอร์ใช้กล้อง และรอจนสถานะเป็นสีเขียว</li>
+              <li>ระบบนับถอยหลัง 3 วินาทีแล้วเริ่มฝึก</li>
+              <li>ใช้ปุ่มพักชั่วคราว ข้ามท่า หรือจบการฝึกได้ตามต้องการ</li>
+              <li>
+                หลังจบโปรแกรม ดูจำนวนครั้งที่ผ่านเกณฑ์ คะแนนท่า และคำแนะนำ
+              </li>
+            </ol>
+          </article>
+          <article class="info-card">
+            <h2>จัดตำแหน่งกล้อง</h2>
+            <ul>
+              <li>วางกล้องให้นิ่งและให้แสงสว่างเพียงพอ</li>
+              <li>
+                สำหรับท่ายืน ให้เว้นระยะจนเห็นส่วนร่างกายที่ท่านั้นต้องใช้
+              </li>
+              <li>
+                Squat และ Lunge: มุมด้านข้างช่วยให้เห็นสะโพก เข่า และข้อเท้า
+              </li>
+              <li>
+                ท่าที่ใช้การยกแขนหรือสลับข้าง:
+                มุมเฉียงด้านหน้าช่วยให้เห็นแขนและขา
+              </li>
+              <li>Glute Bridge: วางกล้องด้านข้างและให้เห็นไหล่ สะโพก เข่า</li>
+              <li>Step-ups: มุมเฉียงด้านหน้า เห็นเท้าและแท่นอย่างชัดเจน</li>
+            </ul>
+          </article>
+          <article class="info-card">
+            <h2>เข้าใจจำนวนครั้งและคะแนน</h2>
+            <ul>
+              <li>
+                <strong>จำนวนครั้ง:</strong>
+                ระบบนับเมื่อพบรูปแบบการเคลื่อนไหวครบตามเกณฑ์ที่กำหนด
+                ไม่ใช่ทุกการขยับ
+              </li>
+              <li>
+                <strong>คะแนนท่า:</strong>
+                ประเมินจากข้อมูลที่มองเห็นและกฎพื้นฐานของท่านั้น
+              </li>
+              <li>
+                <strong>ตรวจจับไม่ชัด:</strong> ระบบจะแจ้งให้ปรับตำแหน่ง
+                ไม่ควรตีความว่าเป็นท่าผิดเสมอไป
+              </li>
+              <li>
+                จำนวนครั้งมากไม่ชดเชยคุณภาพท่าที่ต่ำ
+                เป้าหมายคือควบคุมการเคลื่อนไหวให้ดีขึ้น
+              </li>
+            </ul>
+          </article>
+          <article class="info-card">
+            <h2>ข้อควรระวัง</h2>
+            <ul>
+              <li>เคลียร์พื้นที่รอบตัวก่อนเริ่มและใช้พื้นไม่ลื่น</li>
+              <li>
+                ท่า Step-ups ต้องใช้ขั้นหรือแท่นที่มั่นคง
+                ไม่แนะนำเก้าอี้ทั่วไปที่อาจลื่นหรือพลิกได้
+              </li>
+              <li>
+                Glute Bridge ทำบนพื้นราบได้ ไม่จำเป็นต้องมีเสื่อ
+                แต่ควรเลือกพื้นสะอาดและไม่ลื่น
+              </li>
+              <li>หยุดทันทีหากเจ็บ เวียนศีรษะ หรือรู้สึกไม่สบาย</li>
+              <li>คะแนนจากกล้องไม่ใช่การวินิจฉัยทางการแพทย์</li>
+            </ul>
+          </article>
+          <article class="info-card">
+            <h2>การเข้าถึงสำหรับผู้ใช้สายตาไม่ดี</h2>
+            <p>
+              สถานะกล้องมีข้อความและไอคอนขนาดใหญ่ นอกเหนือจากสี
+              สามารถซูมหน้าเว็บด้วยเบราว์เซอร์ได้ และควรอ่านคำแนะนำก่อนเริ่มฝึก
+              หากมองเห็นสถานะไม่ชัด ให้หยุดฝึกและปรับขนาดหน้าจอ
+            </p>
+            <p>เสียงแจ้งเตือนยังไม่ได้เปิดเป็นค่าเริ่มต้นในรุ่นนี้</p>
+          </article>
+        </div>
+      </section>
+      <section id="guidePage" class="page">
+        <div class="heading">
+          <div>
+            <div class="eyebrow">MOVEMENT LIBRARY</div>
+            <h1>วิธีออกกำลังกาย<em>ที่ถูกต้อง</em></h1>
+            <p>วิธีทำ จุดที่ควรระวัง และสิ่งที่ระบบใช้ประเมินโดยประมาณ</p>
+          </div>
+        </div>
+        <div id="exerciseLibrary" class="exercise-library"></div>
+        <div class="footer">
+          <strong>หมายเหตุ:</strong> คำแนะนำเป็นข้อมูลพื้นฐานเพื่อการเรียนรู้
+          ไม่สามารถครอบคลุมข้อจำกัดทางร่างกายของทุกคน และการตรวจจับด้วยกล้อง 2
+          มิติไม่สามารถยืนยันคุณภาพการเคลื่อนไหวได้ทั้งหมด
+        </div>
+      </section>
+    </main>
+    <div
+      class="modal-backdrop"
+      id="instructionModal"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="modalTitle"
+    >
+      <div class="modal">
+        <div class="eyebrow">BEFORE YOU START</div>
+        <h2 id="modalTitle">เตรียมตัวก่อนฝึก</h2>
+        <p id="modalIntro">ตรวจสอบตำแหน่งกล้องและพื้นที่ก่อนเริ่ม</p>
+        <ul class="modal-list" id="modalList"></ul>
+        <p>
+          <strong>หมายเหตุ:</strong>
+          ระบบจะตรวจความพร้อมของกล้องและการมองเห็นร่างกาย
+          แต่ไม่ได้ตรวจว่าคุณมีอุปกรณ์จริงหรือไม่
+        </p>
+        <div class="modal-actions">
+          <button class="secondary" id="cancelModal">กลับไปตั้งค่า</button
+          ><button class="primary" id="ackModal">รับทราบและตรวจกล้อง</button>
+        </div>
+      </div>
+    </div>
+    <div
+      class="modal-backdrop"
+      id="summaryModal"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="summaryTitle"
+    >
+      <div class="modal">
+        <div class="eyebrow">SESSION COMPLETE</div>
+        <h2 id="summaryTitle">สรุปการฝึกของคุณ</h2>
+        <div id="summaryContent"></div>
+        <div class="modal-actions">
+          <button class="secondary" id="closeSummary">ปิด</button
+          ><button class="primary" id="newWorkout">เริ่มฝึกอีกครั้ง</button>
+        </div>
+      </div>
+    </div>
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+    <script type="module" src="./app.js"></script>
+  </body>
+</html>
